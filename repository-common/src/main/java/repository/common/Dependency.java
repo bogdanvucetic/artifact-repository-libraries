@@ -1,4 +1,4 @@
-package org.example.repository.common;
+package repository.common;
 
 public record Dependency(
         ComponentId id,

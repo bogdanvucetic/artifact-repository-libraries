@@ -1,4 +1,4 @@
-package org.example.repository.common;
+package repository.common;
 
 import java.util.Map;
 import java.util.Set;

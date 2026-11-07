@@ -1,6 +1,6 @@
-package org.example.resolver.api;
+package resolver.api;
 
-import org.example.repository.common.ComponentId;
+import repository.common.ComponentId;
 
 import java.nio.file.Path;
 import java.util.Map;

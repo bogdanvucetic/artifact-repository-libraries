@@ -1,8 +1,8 @@
-package org.example.resolver.api;
+package resolver.api;
 
-import org.example.repository.common.Component;
-import org.example.repository.common.ComponentId;
-import org.example.repository.common.RepositoryConfig;
+import repository.common.Component;
+import repository.common.ComponentId;
+import repository.common.RepositoryConfig;
 
 import java.nio.file.Path;
 import java.util.List;

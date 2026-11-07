@@ -1,4 +1,4 @@
-package org.example.resolver.api;
+package resolver.api;
 
 import java.util.Map;
 

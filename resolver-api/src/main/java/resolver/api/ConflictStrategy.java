@@ -1,4 +1,4 @@
-package org.example.resolver.api;
+package resolver.api;
 
 public enum ConflictStrategy {
     NEWEST_VERSION,
