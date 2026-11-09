@@ -1,5 +1,5 @@
 
-package org.example.repository.common;
+package repository.common;
 
 import org.junit.jupiter.api.Test;
 

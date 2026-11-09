@@ -1,8 +1,8 @@
-package org.example.repository.publisher;
+package repository.publisher;
 
-import org.example.repository.common.Component;
-import org.example.repository.common.ComponentId;
-import org.example.repository.common.Dependency;
+import repository.common.Component;
+import repository.common.ComponentId;
+import repository.common.Dependency;
 
 import java.util.ArrayList;
 import java.util.Collection;

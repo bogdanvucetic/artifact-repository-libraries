@@ -1,9 +1,9 @@
-package org.example.repository.publisher;
+package repository.publisher;
 
-import org.example.repository.common.Component;
-import org.example.repository.common.ComponentId;
-import org.example.repository.common.Dependency;
+import repository.common.Component;
+import repository.common.Dependency;
 import org.junit.jupiter.api.Test;
+import repository.common.ComponentId;
 
 import java.util.List;
 

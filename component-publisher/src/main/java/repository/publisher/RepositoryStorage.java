@@ -1,4 +1,4 @@
-package org.example.repository.publisher;
+package repository.publisher;
 
 import java.io.InputStream;
 import java.util.List;

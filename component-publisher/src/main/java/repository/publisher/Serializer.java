@@ -1,9 +1,9 @@
-package org.example.repository.publisher;
+package repository.publisher;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.example.repository.common.Dependency;
-import org.example.repository.common.RepositoryConfig;
+import repository.common.Dependency;
+import repository.common.RepositoryConfig;
 
 import java.lang.reflect.Type;
 import java.util.List;
