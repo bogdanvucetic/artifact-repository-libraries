@@ -1,9 +1,6 @@
 package repository.publisher;
 
-import repository.common.Component;
-import repository.common.ComponentId;
-import repository.common.Dependency;
-import repository.common.RepositoryConfig;
+import repository.common.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,10 +15,10 @@ public class Publisher {
     //  - create() bez konfig fajla overload?
     //  - da li ima još šta da se overload-uje?
 
-    private final RepositoryStorage storage;
+    private final RepositoryWriter storage;
     private RepositoryConfig config;
 
-    public Publisher(RepositoryStorage storage) {
+    public Publisher(RepositoryWriter storage) {
         this.storage = Objects.requireNonNull(storage, "Storage cannot be null");
     }
 

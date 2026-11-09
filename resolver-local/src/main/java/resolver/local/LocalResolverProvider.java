@@ -1,5 +1,6 @@
 package resolver.local;
 
+import repository.common.RepositoryReader;
 import resolver.api.RepositoryStorage;
 import resolver.api.ResolverProvider;
 
@@ -14,7 +15,7 @@ public class LocalResolverProvider implements ResolverProvider {
     }
 
     @Override
-    public RepositoryStorage open(String location, Map<String, String> options) {
-        return new LocalRepositoryStorage(Path.of(location));
+    public RepositoryReader open(String location, Map<String, String> options) {
+        return new LocalRepositoryReader(Path.of(location));
     }
 }

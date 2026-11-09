@@ -1,15 +1,10 @@
 package resolver.local;
 
-import repository.common.Component;
-import repository.common.ComponentId;
-import repository.common.Dependency;
-import repository.common.RepositoryConfig;
-import repository.common.RepositoryLayout;
-import repository.common.RepositoryMetadata;
-import resolver.api.RepositoryStorage;
+import repository.common.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -17,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LocalRepositoryStorage implements RepositoryStorage {
+public class LocalRepositoryReader implements RepositoryReader {
 
     private final Path root;
 
-    public LocalRepositoryStorage(Path root) {
+    public LocalRepositoryReader(Path root) {
         if (!Files.isDirectory(root)) {
             throw new RuntimeException("Repository does not exist: " + root);
         }
@@ -34,6 +29,7 @@ public class LocalRepositoryStorage implements RepositoryStorage {
         if (!Files.exists(configFile)) {
             throw new RuntimeException("Repository config not found: " + configFile);
         }
+
         return RepositoryMetadata.readConfig(configFile);
     }
 
@@ -110,5 +106,25 @@ public class LocalRepositoryStorage implements RepositoryStorage {
         }
         Collections.sort(result);
         return result;
+    }
+
+    @Override
+    public void openRepositoryAt(String location) {
+
+    }
+
+    @Override
+    public boolean exists(String relativePath) {
+        return false;
+    }
+
+    @Override
+    public List<String> list(String directory) {
+        return List.of();
+    }
+
+    @Override
+    public InputStream read(String relativePath) {
+        return null;
     }
 }

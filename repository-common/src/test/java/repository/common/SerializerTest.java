@@ -1,10 +1,7 @@
-package repository.publisher;
+package repository.common;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import repository.common.ComponentId;
-import repository.common.Dependency;
-import repository.common.RepositoryConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

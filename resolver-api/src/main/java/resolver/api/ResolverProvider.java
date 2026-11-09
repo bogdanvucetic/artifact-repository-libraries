@@ -1,8 +1,10 @@
 package resolver.api;
 
+import repository.common.RepositoryReader;
+
 import java.util.Map;
 
 public interface ResolverProvider {
     String name();
-    RepositoryStorage open(String location, Map<String, String> options);
+    RepositoryReader open(String location, Map<String, String> options);
 }

@@ -1,13 +1,10 @@
 
 package repository.publisher;
 
-import repository.common.Component;
-import repository.common.Dependency;
+import repository.common.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import repository.common.ComponentId;
-import repository.common.RepositoryConfig;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -243,7 +240,7 @@ class PublisherTest {
     // Fake storage implementation for testing
 
     private static class InMemoryRepositoryStorage
-            implements RepositoryStorage {
+            implements RepositoryWriter {
 
         private static class RepositoryData {
             final Map<String, byte[]> files = new HashMap<>();
@@ -376,23 +373,23 @@ class PublisherTest {
             }
         }
 
-        @Override
-        public void overwrite(String relativePath, InputStream content) {
-            if (!repository().files.containsKey(relativePath)) {
-                throw new IllegalArgumentException(
-                        "File not found: " + relativePath
-                );
-            }
-
-            try {
-                repository().files.put(
-                        relativePath,
-                        content.readAllBytes()
-                );
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
+//        @Override
+//        public void overwrite(String relativePath, InputStream content) {
+//            if (!repository().files.containsKey(relativePath)) {
+//                throw new IllegalArgumentException(
+//                        "File not found: " + relativePath
+//                );
+//            }
+//
+//            try {
+//                repository().files.put(
+//                        relativePath,
+//                        content.readAllBytes()
+//                );
+//            } catch (IOException e) {
+//                throw new UncheckedIOException(e);
+//            }
+//        }
 
         byte[] getBytes(String relativePath) {
             byte[] bytes = repository().files.get(relativePath);
