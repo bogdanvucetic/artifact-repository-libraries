@@ -35,6 +35,7 @@ public class Publisher {
         // konfig fajl putanja se dobija iz fokusiran folder.config
         // storage.read(trazeni konfig fajl putanja)
         // deserijalizuj
+        // proveri da je validan
         // vrati objekat
         return null;
     }
