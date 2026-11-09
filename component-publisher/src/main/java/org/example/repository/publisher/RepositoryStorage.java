@@ -4,9 +4,15 @@ import java.io.InputStream;
 import java.util.List;
 
 public interface RepositoryStorage {
+    // todo: polja:
+    //  - putanja/štagod do trenutno otvorenog repozitorijuma
+    //  - RepositoryConfig?
+
     // ova dva će da budu ti koji zapravo fokusiraju storage na neki folder
-    void create(String location);
-    void open(String location);
+    void createRepositoryAt(String location);
+
+    // todo: šta da se desi ako ne postoji? neki izuzetak?
+    void openRepositoryAt(String location);
 
     // todo: biće korisno npr. da proverimo da sve zavisnosti postoje pre nego što publish-ujemo
     boolean exists(String relativePath);
@@ -15,6 +21,9 @@ public interface RepositoryStorage {
 
     // on će se koristiti za readConfig() i readDependencies(), metode koje implementira RepositoryStorage
     InputStream read(String relativePath);
+
+    // potrebno za publish()
+    void createDirectories(String path);
 
     // store and publish operations:
     // todo: should refuse to overwrite an existing file

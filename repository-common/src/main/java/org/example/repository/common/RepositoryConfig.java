@@ -11,5 +11,8 @@ public record RepositoryConfig(
     public RepositoryConfig {
         allowedExtensions = Set.copyOf(allowedExtensions);
         scopes = Map.copyOf(scopes);
+
+        // todo: možda dodatne provere, tipa da ekstenzije nisu ".", da postoji makar jedna ekstenzija i sl.?
+        //  ili pak u Publisher?
     }
 }
