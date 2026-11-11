@@ -1,4 +1,3 @@
-
 package repository.publisher;
 
 import repository.common.*;
@@ -291,7 +290,31 @@ class PublisherTest {
         }
 
         @Override
-        public List<String> list(String directory) {
+        public List<String> listDirectories(String directory) {
+            String prefix = directory.isEmpty() ? "" : directory + "/";
+            List<String> result = new ArrayList<>();
+            for (String name : listChildren(directory)) {
+                if (repository().directories.contains(prefix + name)) {
+                    result.add(name);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public List<String> listFiles(String directory) {
+            String prefix = directory.isEmpty() ? "" : directory + "/";
+            List<String> result = new ArrayList<>();
+            for (String name : listChildren(directory)) {
+                if (repository().files.containsKey(prefix + name)) {
+                    result.add(name);
+                }
+            }
+            return result;
+        }
+
+        // stara list() metoda, sada samo pomocna za listDirectories/listFiles
+        private List<String> listChildren(String directory) {
             RepositoryData repo = repository();
 
             String prefix = directory.isEmpty()

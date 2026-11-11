@@ -6,7 +6,9 @@ public interface RepositoryWriter extends RepositoryReader {
     // ova dva će da budu ti koji zapravo fokusiraju storage na neki folder
     void createRepositoryAt(String location);
 
+    void openRepositoryAt(String location);
     // potrebno za publish()
+
     void createDirectories(String path);
 
     // store and publish operations:

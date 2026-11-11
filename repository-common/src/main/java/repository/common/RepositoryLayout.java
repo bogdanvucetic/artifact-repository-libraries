@@ -2,12 +2,11 @@ package repository.common;
 
 public final class RepositoryLayout {
 
-
     // utility klasa koja definiše stvari kao CONFIG_FILE ime, METADATA_FILE ime, regeks obrazac sa kojim se
     // poklapa ime komponente?
 
-    public static final String CONFIG_FILE = "repository-config.json";
-    public static final String METADATA_FILE = "component.json";
+    public static final String CONFIG_FILE = "config.json";
+    public static final String METADATA_FILE = "dependencies.json";
     public static final String ROOT = "";
 
     private RepositoryLayout() {
