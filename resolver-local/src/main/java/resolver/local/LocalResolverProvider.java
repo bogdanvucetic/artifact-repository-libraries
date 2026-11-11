@@ -1,7 +1,6 @@
 package resolver.local;
 
 import repository.common.RepositoryReader;
-import resolver.api.RepositoryStorage;
 import resolver.api.ResolverProvider;
 
 import java.nio.file.Path;
