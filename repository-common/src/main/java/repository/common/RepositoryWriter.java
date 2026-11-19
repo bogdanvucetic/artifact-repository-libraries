@@ -5,6 +5,7 @@ import java.io.InputStream;
 // todo:
 //  - promenimo ime u StorageWriter da bi isli zajedno StorageReader, StorageWriter i
 //    StorageProvider
+//  - writeNew() -> createFile()
 public interface RepositoryWriter extends RepositoryReader {
     // ova dva će da budu ti koji zapravo fokusiraju storage na neki folder
     void createRepositoryAt(String location);

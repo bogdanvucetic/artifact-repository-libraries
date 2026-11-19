@@ -103,7 +103,6 @@ public class Main {
         System.out.println(config);
     }
 
-    //
     private static void create(String[] input) {
         try {
             publisher.create(input[1], config);
@@ -166,7 +165,7 @@ public class Main {
                   create <path>
                   open <path>
                   metadata <organization> <name> <version> <dependencies: organization:name:version:scope:optional>
-                  publish <metadata> <file>
+                  publish <file>
                   help
                   exit
                 

@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+// todo
+//  - create/open/publish -> createRepository(), openRepository(), publishToRepository()
 public class Publisher {
     // todo:
     //  - create() bez konfig fajla overload?

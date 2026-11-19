@@ -12,6 +12,9 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /** Lokalni "drajver": relativne putanje repozitorijuma mapira na folder na disku. */
+
+// todo:
+//  - trebao bi da proveri da je putanja validan repozitorijum
 public class LocalRepositoryReader implements RepositoryReader {
 
     protected final Path root;
