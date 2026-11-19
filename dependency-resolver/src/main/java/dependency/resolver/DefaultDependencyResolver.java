@@ -1,27 +1,26 @@
 package dependency.resolver;
 
-import repository.common.Component;
-import repository.common.ComponentId;
-import repository.common.Dependency;
-import repository.common.RepositoryConfig;
+import repository.common.*;
 import resolver.api.ComponentIds;
 import resolver.api.ConflictStrategy;
 import resolver.api.DependencyResolver;
-import resolver.api.RepositoryStorage;
 import resolver.api.ResolutionResult;
 import resolver.api.ResolveOptions;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class DefaultDependencyResolver implements DependencyResolver {
 
-    private final RepositoryStorage storage;
+    private final RepositoryReader reader;
 
-    public DefaultDependencyResolver(RepositoryStorage storage) {
-        this.storage = storage;
+    public DefaultDependencyResolver(RepositoryReader reader) {
+        this.reader = reader;
     }
 
     private static class FoundComponent {
@@ -41,7 +40,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
     @Override
     public ResolutionResult resolve(List<ComponentId> roots, ResolveOptions options) {
 
-        RepositoryConfig config = storage.readConfig();
+        RepositoryConfig config = readConfig();
 
         Map<String, String> forcedVersions = new HashMap<>();
 
@@ -88,7 +87,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         Map<ComponentId, Path> downloaded = new LinkedHashMap<>();
 
         for (ComponentId id : selected.values()) {
-            Path file = storage.download(id, options.targetDir());
+            Path file = download(id, options.targetDir());
             downloaded.put(id, file);
         }
 
@@ -111,21 +110,19 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
             FoundComponent current = queue.poll();
 
-            Component componentData = storage.readComponent(current.id);
-
-            boolean direct = current.depth == 0;
+            Component componentData = readComponent(current.id);
 
             for (Dependency dependency : componentData.dependencies()) {
 
-                if (!direct) {
-                    if (dependency.optional()) {
-                        continue;
-                    }
+                // komponente iz fajla su direktne zavisnosti projekta,
+                // pa su njihove zavisnosti vec tranzitivne i za njih vaze pravila
+                if (dependency.optional()) {
+                    continue;
+                }
 
-                    Boolean transitive = config.scopes().get(dependency.scope());
-                    if (transitive == null || !transitive) {
-                        continue;
-                    }
+                Boolean transitive = config.scopes().get(dependency.scope());
+                if (transitive == null || !transitive) {
+                    continue;
                 }
 
                 addToQueue(dependency.id(), current.depth + 1,
@@ -214,6 +211,59 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
 
         return true;
+    }
+
+
+    private RepositoryConfig readConfig() {
+        String path = RepositoryLayout.configFile();
+        if (!reader.exists(path)) {
+            throw new RepositoryException("Repository config not found");
+        }
+        return Serializer.deserializeConfig(readText(path));
+    }
+
+    private Component readComponent(ComponentId id) {
+        String path = RepositoryLayout.metadataFile(id);
+        if (!reader.exists(path)) {
+            throw new RepositoryException("Component not found: " + id);
+        }
+        List<Dependency> dependencies = Serializer.deserializeDependencies(readText(path));
+        return new Component(id, dependencies == null ? List.of() : dependencies);
+    }
+
+    private Path download(ComponentId id, Path targetDir) {
+        String fileName = findArtifactName(id);
+        String source = RepositoryLayout.componentDir(id) + "/" + fileName;
+
+        try (InputStream in = reader.read(source)) {
+            Path target = targetDir.resolve(fileName);
+            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+            return target;
+        } catch (IOException e) {
+            throw new RepositoryException("Error downloading component: " + id, e);
+        }
+    }
+
+    // fajl komponente je jedini fajl u folderu verzije koji nije fajl sa zavisnostima
+    private String findArtifactName(ComponentId id) {
+        String dir = RepositoryLayout.componentDir(id);
+        if (!reader.exists(dir)) {
+            throw new RepositoryException("Component not found: " + id);
+        }
+        for (String name : reader.listFiles(dir)) {
+            if (!name.equals(RepositoryLayout.METADATA_FILE)) {
+                return name;
+            }
+        }
+        throw new RepositoryException("Component file not found: " + id);
+    }
+
+    private String readText(String path) {
+        try (InputStream in = reader.read(path)) {
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RepositoryException("Error reading " + path, e);
+        }
     }
 
     @Override
