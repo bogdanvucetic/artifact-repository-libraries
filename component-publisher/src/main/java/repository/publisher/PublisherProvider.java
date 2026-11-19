@@ -10,6 +10,8 @@ ovo samo služi da CLI dobije pravi writer (local/mreža/drive) a da ne zna konk
 isto kao ResolverProvider kod resolvera. lokalna implementacija je u publisher-local.
 vidi da l ti okej pa da cepamo dalje */
 
+// todo:
+//  - obrisali i spojili u jedan StorageProvider u common
 public interface PublisherProvider {
 
     // ime drajvera samo da l je drive local itd

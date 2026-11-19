@@ -6,6 +6,8 @@ import resolver.api.ResolverProvider;
 import java.nio.file.Path;
 import java.util.Map;
 
+// todo:
+//  - obrisali i spojili u jedan StorageProvider u common
 public class LocalResolverProvider implements ResolverProvider {
 
     @Override

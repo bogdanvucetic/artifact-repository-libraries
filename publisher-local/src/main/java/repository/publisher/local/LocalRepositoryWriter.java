@@ -13,6 +13,9 @@ import java.util.List;
 
 // lokalni writer, repo je obican folder na disku
 // za citanje koristim LocalRepositoryReader iz resolvera da ne pisem isto dva puta
+
+// todo:
+//  - AKO IMAM VREMENA: createRepositoryAt() da ~ pretvori u home repozitorijum
 public class LocalRepositoryWriter implements RepositoryWriter {
 
     private Path root;

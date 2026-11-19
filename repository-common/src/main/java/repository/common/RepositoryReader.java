@@ -3,6 +3,9 @@ package repository.common;
 import java.io.InputStream;
 import java.util.List;
 
+// todo:
+//  - promenimo ime u StorageReader da bi isli zajedno StorageReader, StorageWriter i
+//    StorageProvider
 public interface RepositoryReader extends AutoCloseable{
     // todo: polja:
     //  - putanja/štagod do trenutno otvorenog repozitorijuma
