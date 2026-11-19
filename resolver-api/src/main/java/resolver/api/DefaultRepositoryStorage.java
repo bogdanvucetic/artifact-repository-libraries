@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+// TODO: OBRISATI
 public class DefaultRepositoryStorage implements RepositoryStorage {
 
     private final RepositoryReader reader;

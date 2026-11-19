@@ -7,6 +7,7 @@ import repository.common.RepositoryConfig;
 import java.nio.file.Path;
 import java.util.List;
 
+// TODO: OBRISATI
 public interface RepositoryStorage extends AutoCloseable {
     RepositoryConfig readConfig();
 

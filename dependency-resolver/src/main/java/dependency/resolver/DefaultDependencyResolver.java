@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+// TODO: promeniti tako da ne koristi RepositoryStrage nego RepositoryReader
 public class DefaultDependencyResolver implements DependencyResolver {
 
     private final RepositoryStorage storage;
