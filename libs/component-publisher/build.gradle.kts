@@ -1,17 +1,17 @@
 plugins {
-    id("java")
+    `java-library`
 }
 
 group = "org.example"
-version = "unspecified"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(project(":component-publisher"))
-    runtimeOnly(project(":publisher-local"))
+    api(project(":libs:repository-common"))
+    implementation("com.google.code.gson:gson:2.15.0")
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

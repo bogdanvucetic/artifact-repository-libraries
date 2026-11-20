@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":resolver-api"))
+    api(project(":libs:resolver-api"))
 }
