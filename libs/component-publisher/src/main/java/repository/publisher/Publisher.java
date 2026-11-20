@@ -10,6 +10,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+/*
+TODO: OBAVEZNO:
+ - reusability:
+   - da se tri identifikator projekta moze zadati preko tri stringa, kao
+     jedan string, jos nacina
+ - repo search operacije:
+   - za organizaciju vraca sve njene projekte
+   - za org + projekat vraca sve verzije
+   - spisak zavisnosti neke komponente
+ */
+
 // todo
 //  - create/open/publish -> createRepository(), openRepository(), publishToRepository()
 public class Publisher {

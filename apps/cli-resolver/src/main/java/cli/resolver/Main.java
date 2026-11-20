@@ -12,6 +12,8 @@ import java.util.*;
 
 // todo: BAGOVI:
 //  - open za RAF server otvori repozitorijum koji ne postoji
+//  - kada je izuzetak samo crash-uje umesto da ga catch-uje
+//    - npr. da ne postoji fajl koji hocemo da pull-ujemo
 //
 // todo:
 //  - da proverava da li je otvoren fajl repozitorijum (da li ima config.json)

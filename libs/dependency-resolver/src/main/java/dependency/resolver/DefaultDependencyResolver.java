@@ -1,7 +1,6 @@
 package dependency.resolver;
 
 import repository.common.*;
-import resolver.api.ComponentIds;
 import resolver.api.ConflictStrategy;
 import resolver.api.DependencyResolver;
 import resolver.api.ResolutionResult;
@@ -14,6 +13,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+
+/*
+TODO: OBAVEZNO:
+ - koliko vidim ne povlaci sve zavisnosti kada:
+   - ja stavim includeOptionalRoots=true, ne povuce onaj koji je optional
+ - reusability:
+   - da se zada organizacija/projekat iz kojeg se povlace sve komponente,
+   - da se tri identifikator projekta moze zadati preko tri stringa, kao
+     jedan string, jos nacina
+ - repo search operacije:
+   - za organizaciju vraca sve njene projekte
+   - za org + projekat vraca sve verzije
+   - spisak zavisnosti neke komponente
+ */
 
 // todo:
 //  - da li sam lepo razumeo da, ako npr. u repozitorijumu stoji da je neki scope
@@ -284,7 +297,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 line = line.trim();
 
                 if (!line.isEmpty()) {
-                    roots.add(ComponentIds.parse(line));
+                    String[] p = line.trim().split(":");
+                    if (p.length != 3) throw new IllegalArgumentException("Ocekivano organizacija:naziv:verzija, a stiglo: " + line);
+                    roots.add(new ComponentId(p[0], p[1], p[2]));
                 }
             }
 
