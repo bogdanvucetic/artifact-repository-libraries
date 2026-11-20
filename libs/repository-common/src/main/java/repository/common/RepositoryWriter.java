@@ -2,6 +2,9 @@ package repository.common;
 
 import java.io.InputStream;
 
+// TODO MORA:
+//  - sve metode za list i sl. ovde, kao default implementacije
+
 // todo:
 //  - promenimo ime u StorageWriter da bi isli zajedno StorageReader, StorageWriter i
 //    StorageProvider

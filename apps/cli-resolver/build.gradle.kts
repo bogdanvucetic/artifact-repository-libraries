@@ -10,10 +10,10 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":repository-common"))
-    implementation(project(":component-publisher"))
-    implementation(project(":resolver-local"))
-
+    implementation(project(":libs:resolver-api"))
+    implementation(project(":libs:dependency-resolver"))
+    runtimeOnly(project(":impls:resolver-local"))
+    runtimeOnly(project(":impls:raf-resolver"))
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

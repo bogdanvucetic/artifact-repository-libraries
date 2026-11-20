@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":repository-common"))
+    api(project(":libs:repository-common"))
 }
