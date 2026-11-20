@@ -34,7 +34,7 @@ public class Publisher {
         String json = Serializer.serializeConfig(config);
 
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
-            storage.writeNew("config.json", stream);
+            storage.writeNew(location + "/config.json", stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write repository configuration", e);
         }

@@ -10,6 +10,9 @@ import resolver.api.ResolverProvider;
 import java.nio.file.Path;
 import java.util.*;
 
+// todo: BAGOVI:
+//  - open za RAF server otvori repozitorijum koji ne postoji
+//
 // todo:
 //  - da proverava da li je otvoren fajl repozitorijum (da li ima config.json)
 //    i da li uspeva da ga parsira i sve sl. pre nego sto kaze uspesno
