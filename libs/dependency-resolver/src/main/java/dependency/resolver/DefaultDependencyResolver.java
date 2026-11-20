@@ -1,5 +1,8 @@
 package dependency.resolver;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import repository.common.*;
 import resolver.api.ConflictStrategy;
 import resolver.api.DependencyResolver;
@@ -8,6 +11,7 @@ import resolver.api.ResolveOptions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +41,7 @@ TODO: OBAVEZNO:
 public class DefaultDependencyResolver implements DependencyResolver {
 
     private final RepositoryReader reader;
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public DefaultDependencyResolver(RepositoryReader reader) {
         this.reader = reader;
@@ -238,7 +243,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
         if (!reader.exists(path)) {
             throw new RepositoryException("Repository config not found");
         }
-        return Serializer.deserializeConfig(readText(path));
+        return gson.fromJson(readText(path), RepositoryConfig.class);
     }
 
     private Component readComponent(ComponentId id) {
@@ -246,7 +251,9 @@ public class DefaultDependencyResolver implements DependencyResolver {
         if (!reader.exists(path)) {
             throw new RepositoryException("Component not found: " + id);
         }
-        List<Dependency> dependencies = Serializer.deserializeDependencies(readText(path));
+
+        Type type = new TypeToken<List<Dependency>>() {}.getType();
+        List<Dependency> dependencies = gson.fromJson(readText(path), type);
         return new Component(id, dependencies == null ? List.of() : dependencies);
     }
 

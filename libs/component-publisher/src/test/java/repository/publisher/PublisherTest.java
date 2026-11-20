@@ -1,5 +1,8 @@
 package repository.publisher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import repository.common.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PublisherTest {
 
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     @TempDir
     Path tempDir;
 
@@ -63,7 +68,7 @@ class PublisherTest {
                 StandardCharsets.UTF_8
         );
 
-        assertEquals(config, Serializer.deserializeConfig(json));
+        assertEquals(config, gson.fromJson(json, RepositoryConfig.class));
     }
 
     @Test
@@ -97,9 +102,11 @@ class PublisherTest {
                 StandardCharsets.UTF_8
         );
 
+        Type type = new TypeToken<List<Dependency>>() {}.getType();
+
         assertEquals(
                 List.of(),
-                Serializer.deserializeDependencies(json)
+                gson.fromJson(json, type)
         );
     }
 
@@ -193,9 +200,11 @@ class PublisherTest {
                 StandardCharsets.UTF_8
         );
 
+        Type type = new TypeToken<List<Dependency>>() {}.getType();
+
         assertEquals(
                 List.of(dependency),
-                Serializer.deserializeDependencies(json)
+                gson.fromJson(json, type)
         );
     }
 

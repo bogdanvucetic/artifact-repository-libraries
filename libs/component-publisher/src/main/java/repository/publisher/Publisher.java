@@ -1,5 +1,7 @@
 package repository.publisher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import repository.common.*;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +32,7 @@ public class Publisher {
 
     private final RepositoryWriter storage;
     private RepositoryConfig config;
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public Publisher(RepositoryWriter storage) {
         this.storage = Objects.requireNonNull(storage, "Storage cannot be null");
@@ -42,7 +45,7 @@ public class Publisher {
         this.config = null;
         storage.createRepositoryAt(location);
 
-        String json = Serializer.serializeConfig(config);
+        String json = gson.toJson(config);
 
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
             storage.writeNew(location + "/config.json", stream);
@@ -80,7 +83,7 @@ public class Publisher {
             throw new RuntimeException("Failed to write component", e);
         }
 
-        String json = Serializer.serializeDependencies(component.dependencies());
+        String json = gson.toJson(component.dependencies());
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
             storage.writeNew(directory + "/dependencies.json", stream);
         } catch (IOException e) {
@@ -91,7 +94,7 @@ public class Publisher {
     private void loadConfig() {
         try (InputStream stream = storage.read("config.json")) {
             String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            RepositoryConfig loadedConfig = Serializer.deserializeConfig(json);
+            RepositoryConfig loadedConfig = gson.fromJson(json, RepositoryConfig.class);
 
             validateConfig(loadedConfig);
             config = loadedConfig;

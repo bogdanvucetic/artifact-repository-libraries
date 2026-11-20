@@ -4,6 +4,9 @@ import java.io.InputStream;
 
 // TODO MORA:
 //  - sve metode za list i sl. ovde, kao default implementacije
+//    (IPAK U PUBLISHER I RESOLVER, NIJE IM OVDE MESTO, ovde gde su samo bejzik rw operacije)
+//    one ce da delegiraju ovde
+//    - tipa onda readFileContent(), readFolderContent() metode?
 
 // todo:
 //  - promenimo ime u StorageWriter da bi isli zajedno StorageReader, StorageWriter i
