@@ -10,15 +10,17 @@ public record Component(
         List<Dependency> dependencies
 ) {
     public Component {
-        Objects.requireNonNull(id, "ID cannot be null");
+        Objects.requireNonNull(id, "ID ne sme biti null");
+        Objects.requireNonNull(dependencies, "Lista zavisnosti ne sme biti null");
 
-        Set<ComponentId> ids = new HashSet<>();
+        Set<ComponentId> seen = new HashSet<>();
 
         for (Dependency d : dependencies) {
-            if (ids.contains(d.id())) {
-                throw new IllegalArgumentException("Duplicate dependency:" + d.id());
-            }
-            ids.add(d.id());
+            Objects.requireNonNull(d, "Zavisnost ne sme biti null");
+            if (seen.contains(d.id()))
+                throw new IllegalArgumentException("Dupla zavisnost:" + d.id());
+
+            seen.add(d.id());
         }
 
         dependencies = List.copyOf(dependencies);

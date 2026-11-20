@@ -8,7 +8,10 @@ public record Dependency(
         boolean optional
 ) {
     public Dependency {
-        Objects.requireNonNull(id, "ID cannot be null");
-        Objects.requireNonNull(scope, "Scope cannot be null");
+        Objects.requireNonNull(id, "ID ne sme biti null");
+        Objects.requireNonNull(scope, "Scope ne sme biti null");
+
+        if (scope.isBlank())
+            throw new IllegalArgumentException("Scope ne sme biti prazan");
     }
 }
