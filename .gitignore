@@ -43,3 +43,7 @@ bin/
 credentials.json
 tokens/
 *.p12
+
+config/*.json
+tokens/
+tokens-backup/
