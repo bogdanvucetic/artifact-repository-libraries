@@ -12,13 +12,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-// lokalni writer, repo je obican folder na disku
-// za citanje koristim LocalRepositoryReader iz resolvera da ne pisem isto dva puta
-
-// todo:
-//  - da ne otvori folder ako nema config.json
-//  - AKO IMAM VREMENA: da resolve() ne prihivata symlink-ove
-//  - AKO IMAM VREMENA: createRepositoryAt() da ~ pretvori u home repozitorijum
 public class LocalStorage implements Storage {
 
     private Path root;
@@ -80,8 +73,6 @@ public class LocalStorage implements Storage {
             throw new RepositoryException("Greska pri upisu: " + relativePath, e);
         }
     }
-
-    // citanje samo prosledjujem readeru
 
     @Override
     public boolean exists(String relativePath) {
