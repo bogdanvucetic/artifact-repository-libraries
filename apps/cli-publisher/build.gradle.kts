@@ -11,8 +11,10 @@ repositories {
 
 dependencies {
     implementation(project(":libs:component-publisher"))
+
     runtimeOnly(project(":impls:publisher-local"))
     runtimeOnly(project(":impls:publisher-raf"))
+    runtimeOnly(project(":impls:publisher-drive"))
 
     testImplementation(platform("org.junit:junit-bom:6.0.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
