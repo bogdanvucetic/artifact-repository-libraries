@@ -72,6 +72,7 @@ public class Main {
                 case "open" -> open(input);
                 case "metadata" -> metadata(input);
                 case "publish" -> publish(input);
+                case "list" -> list(input);
                 case "help" -> help();
                 case "exit" -> running = false;
                 default -> System.out.println("Nevalidna opcija");
@@ -163,6 +164,37 @@ public class Main {
         }
     }
 
+    private static void list(String[] input) {
+        try {
+            List<String> results;
+
+            switch (input.length) {
+                case 1 -> results = publisher.listAllOrganizations();
+                case 2 -> results = publisher.listAllProjectsInOrganization(
+                        input[1]);
+                case 3 -> results = publisher.listAllProjectVersions(
+                        input[1], input[2]);
+                case 4 -> results = publisher.listAllProjectDependencies(
+                        input[1], input[2], input[3]).stream().map(Objects::toString).toList();
+                default -> {
+                    System.out.println("Upotreba: list [organization] [name] [version]");
+                    return;
+                }
+            }
+
+            if (results.isEmpty()) {
+                System.out.println("Nema rezultata");
+                return;
+            }
+
+            for (String result : results)
+                System.out.println(result);
+
+        } catch (Exception e) {
+            System.out.println("Greska: " + e.getMessage());
+        }
+    }
+
     private static void firstEntry() {
         System.out.println("""
                 ================================================
@@ -180,6 +212,7 @@ public class Main {
                   open <path>
                   metadata <organization> <name> <version> <dependencies: organization:name:version:scope:optional>
                   publish <file>
+                  list [organization] [name] [version]
                   help
                   exit
                 

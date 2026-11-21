@@ -2,6 +2,7 @@ package repository.publisher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import repository.common.*;
 
 import java.io.ByteArrayInputStream;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 
 /*
@@ -26,10 +28,6 @@ TODO: OBAVEZNO:
 // todo
 //  - create/open/publish -> createRepository(), openRepository(), publishToRepository()
 public class Publisher {
-    // todo:
-    //  - create() bez konfig fajla overload?
-    //  - da li ima još šta da se overload-uje?
-
     private final Storage storage;
     private RepositoryConfig config;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -59,10 +57,6 @@ public class Publisher {
     public void open(String location) {
         this.config = null;
         storage.openRepositoryAt(location);
-
-        if (!storage.exists(location + "/config.json"))
-            throw new RepositoryException("Folder nije repozitorijum: config.json ne postoji");
-
         loadConfig();
     }
 
@@ -95,6 +89,69 @@ public class Publisher {
         }
     }
 
+    public List<String> listAllOrganizations() {
+        return storage.listDirectories("");
+    }
+
+    public List<String> listAllProjectsInOrganization(String organization) {
+        Objects.requireNonNull(organization, "Organizacija ne moze biti null");
+
+        if (organization.isBlank())
+            throw new RepositoryException("Naziv organizacije ne moze biti prazan");
+
+        return storage.listDirectories(organization);
+    }
+
+    public List<String> listAllProjectsInOrganization(ComponentId id) {
+        Objects.requireNonNull(id, "ID komponente ne moze biti null");
+        return listAllProjectsInOrganization(id.organization());
+    }
+
+    public List<String> listAllProjectVersions(String organization, String name) {
+        Objects.requireNonNull(organization, "Organizacija ne moze biti null");
+        Objects.requireNonNull(name, "Naziv projekta ne moze biti null");
+
+        if (organization.isBlank())
+            throw new RepositoryException("Naziv organizacije ne moze biti prazan");
+
+        if (name.isBlank())
+            throw new RepositoryException("Naziv projekta ne moze biti prazan");
+
+        return storage.listDirectories(organization + "/" + name);
+    }
+
+    public List<String> listAllProjectVersions(ComponentId id) {
+        Objects.requireNonNull(id, "ID komponente ne moze biti null");
+        return listAllProjectVersions(id.organization(), id.name());
+    }
+
+    public List<Dependency> listAllProjectDependencies(String organization, String name, String version) {
+        return listAllProjectDependencies(new ComponentId(organization, name, version));
+    }
+
+    public List<Dependency> listAllProjectDependencies(ComponentId id) {
+        Objects.requireNonNull(id, "ID komponente ne moze biti null");
+
+        String path = componentDirectory(id) + "/dependencies.json";
+
+        if (!storage.exists(path))
+            throw new RepositoryException("Komponenta nije pronadjena: " + id);
+
+        try (InputStream stream = storage.read(path)) {
+            String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+
+            List<Dependency> dependencies = gson.fromJson(json,
+                    new TypeToken<List<Dependency>>() {}.getType());
+
+            if (dependencies == null)
+                throw new RepositoryException("Nevalidan dependencies.json: " + id);
+
+            return new Component(id, dependencies).dependencies();
+        } catch (Exception e) {
+            throw new RepositoryException("Neuspesno citanje zavisnosti: " + id, e);
+        }
+    }
+
     private void loadConfig() {
         try (InputStream stream = storage.read("config.json")) {
             String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
@@ -107,11 +164,6 @@ public class Publisher {
         }
     }
 
-    // todo: eventualno za sve te provere
-    //  - može npr. da ne prihvata "/", "." i sl. karaktere za ekstenzije
-    //  - pa da scope-ovi nisu " "
-    //  - da je neophodna makar jedna ekstenzija
-    // mada ovo možda može i u RepositoryConfig konstruktor
     private void validateConfig(RepositoryConfig config) {
         if (config == null)
             throw new RepositoryException("Nevalidan config.json");
@@ -169,6 +221,4 @@ public class Publisher {
     public RepositoryConfig getConfig() {
         return config;
     }
-
-    // todo: sve navedene list metode
 }
