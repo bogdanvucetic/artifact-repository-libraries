@@ -1,12 +1,5 @@
 plugins {
-    id("java")
-}
-
-group = "org.example"
-version = "unspecified"
-
-repositories {
-    mavenCentral()
+    application
 }
 
 dependencies {
@@ -15,12 +8,9 @@ dependencies {
     runtimeOnly(project(":impls:publisher-local"))
     runtimeOnly(project(":impls:publisher-raf"))
     runtimeOnly(project(":impls:publisher-drive"))
-
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.test {
-    useJUnitPlatform()
+application {
+    mainClass = "cli.publisher.Main"
+    applicationName = "publisher"
 }

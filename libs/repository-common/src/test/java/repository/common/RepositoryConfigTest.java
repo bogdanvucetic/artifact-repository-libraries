@@ -29,7 +29,7 @@ class RepositoryConfigTest {
         extensions.add("jar");
 
         RepositoryConfig config =
-                new RepositoryConfig(extensions, Map.of());
+                new RepositoryConfig(extensions, Map.of("md", true));
 
         extensions.add("zip");
 
@@ -52,7 +52,7 @@ class RepositoryConfigTest {
     @Test
     void extensionsCannotBeModified() {
         RepositoryConfig config =
-                new RepositoryConfig(Set.of("jar"), Map.of());
+                new RepositoryConfig(Set.of("jar"), Map.of("md", true));
 
         assertThrows(UnsupportedOperationException.class,
                 () -> config.allowedExtensions().add("zip"));

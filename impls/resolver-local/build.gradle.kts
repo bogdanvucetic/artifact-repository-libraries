@@ -1,7 +1,3 @@
-plugins {
-    `java-library`
-}
-
 dependencies {
-    api(project(":libs:resolver-api"))
+    implementation(project(":libs:resolver-api"))
 }

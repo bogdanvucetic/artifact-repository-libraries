@@ -9,6 +9,7 @@ import java.util.*;
 
 /*
 TODO:
+ - da ne baci unsupported scope tek pri publish nego odmah pri dodavanju u cli
  - da se komponenta gradi kao component id <organization> <name> <version>,
    component add <organization> <name> <version> <scope> <optional>
    i tako lakse epreko builder-a, i onda u publish() da se zove build
