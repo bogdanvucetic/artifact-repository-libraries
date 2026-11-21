@@ -1,56 +1,53 @@
 package cli.publisher;
 
 import repository.common.*;
+import repository.publisher.ComponentBuilder;
 import repository.publisher.Publisher;
+import repository.publisher.RepositoryConfigBuilder;
 
 import java.nio.file.Path;
 import java.util.*;
 
-/*
-TODO:
-- pri metadata ili sl. komponenti da radi provere i da ne da dalje ako ima necega nepravilnog
-
- - da ne baci unsupported scope tek pri publish nego odmah pri dodavanju u cli
- - da se komponenta gradi kao component id <organization> <name> <version>,
-   component add <organization> <name> <version> <scope> <optional>
-   i tako lakse epreko builder-a, i onda u publish() da se zove build
- - sve razne potrebne provere radi robustnosti u metodama
- - create: robust argument handling
-   - [ ] if (input.length < 2)
-   - [ ] if (input[1] == null
- - publish: robust argument handling
-   - [ ] if (input.length < 2)
-   - [ ] if (input[1] == null
- - open: robust argument handling
-   - [ ] if (input.length < 2)
-   - [ ] if (input[1] == null
- - metadata: robust argument handling
- - AKO IMAM VREMENA: bolje poruke tipa
-   - create: Uspesno kreiran repozitorijum na <abs-path>
- - AKO IMAM VREMENA: umesto menija da bude niz komandi i da se otvoreni repozitorijum
-   cuva u nekom fajlu na sistemu, i otuda povlaci
- */
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static Publisher publisher;
-    private static RepositoryConfig config;
-    private static Component component;
+    private static RepositoryConfigBuilder configBuilder = new RepositoryConfigBuilder();
+    private static ComponentBuilder componentBuilder;
 
     public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Upotreba: publisher <implementacija>");
+            return;
+        }
+
         ServiceLoader<StorageProvider> loader = ServiceLoader.load(StorageProvider.class);
 
         StorageProvider provider = loader.stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(p -> p.name().equals(args[0]))
                 .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Nepoznat tip repozitorijuma"));
+                .orElse(null);
 
-        publisher = new Publisher(provider.create(null));
+        if (provider == null) {
+            System.out.println("Nepoznata implementacija: " + args[0]);
+            return;
+        }
 
-        System.out.println("Uspesno povezan na " + provider.name());
+        Storage storage = provider.create(Map.of());
+        publisher = new Publisher(storage);
 
-        menu();
+        try {
+            System.out.println("Uspesno povezan na " + provider.name());
+            menu();
+        } finally {
+            if (storage instanceof AutoCloseable closeable) {
+                try {
+                    closeable.close();
+                } catch (Exception e) {
+                    System.out.println("Greska pri zatvaranju: " + e.getMessage());
+                }
+            }
+        }
     }
 
     private static void menu() {
@@ -59,18 +56,26 @@ public class Main {
 
         while (running) {
             if (first) {
-                firstEntry();
+                help();
                 first = false;
             }
 
-            String[] input = scanner.nextLine().trim().split(" ");
+            if (!scanner.hasNextLine())
+                break;
+
+            String line = scanner.nextLine().trim();
+            if (line.isEmpty())
+                continue;
+            String[] input = line.split("\\s+");
+
             String choice = input[0];
 
             switch (choice) {
                 case "config" -> config(input);
                 case "create" -> create(input);
                 case "open" -> open(input);
-                case "metadata" -> metadata(input);
+                case "id" -> id(input);
+                case "dependency" -> dependency(input);
                 case "publish" -> publish(input);
                 case "list" -> list(input);
                 case "help" -> help();
@@ -84,38 +89,71 @@ public class Main {
     }
 
     private static void config(String[] input) {
-        Set<String> allowedExtensions = new HashSet<>();
-        Map<String, Boolean> scopes = new HashMap<>();
-
-        int i = 1;
-
-        while (!input[i].equals("--scopes")) {
-            allowedExtensions.add(input[i]);
-            i += 1;
-        }
-
-        i += 1;
-
-        while (i < input.length) {
-            String[] entry = input[i].split(":");
-            String scope = entry[0];
-            Boolean isTransitive = Boolean.parseBoolean(entry[1]);
-            scopes.put(scope, isTransitive);
-            i += 1;
+        if (input.length < 2) {
+            System.out.println("Upotreba: config extensions <extensions|scopes|clear>");
+            return;
         }
 
         try {
-            config = new RepositoryConfig(allowedExtensions, scopes);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+            switch (input[1]) {
+                case "extensions" -> {
+                    if (input.length < 3) {
+                        System.out.println("Upotreba: config extensions <extensions>...");
+                        return;
+                    }
 
-        System.out.println(config);
+                    configBuilder.addExtensions(
+                            Arrays.asList(input).subList(2, input.length)
+                    );
+                    System.out.println("Uspesno dodate ekstenzije");
+                }
+                case "scopes" -> {
+                    if (input.length < 4 || input.length % 2 != 0) {
+                        System.out.println("Upotreba: config scopes <scope> <bool>...");
+                        return;
+                    }
+
+                    Map<String, Boolean> scopes = new HashMap<>();
+
+                    for (int i = 2; i < input.length; i += 2) {
+                        String value = input[i + 1];
+
+                        if (!value.equalsIgnoreCase("true")
+                                && !value.equalsIgnoreCase("false"))
+                            throw new IllegalArgumentException("Ocekivano true ili false: " + value);
+
+                        scopes.put(input[i], Boolean.parseBoolean(value));
+                    }
+
+                    configBuilder.addScopes(scopes);
+                    System.out.println("Uspesno dodati scope-ovi");
+                }
+                case "clear" -> {
+                    if (input.length != 2) {
+                        System.out.println("Upotreba: config clear");
+                        return;
+                    }
+
+                    configBuilder = new RepositoryConfigBuilder();
+                    System.out.println("Konfiguracija obrisana");
+                }
+                default -> System.out.println("Nepoznata config opcija: " + input[1]);
+            }
+        } catch (Exception e) {
+            System.out.println("Greska: " + e.getMessage());
+        }
     }
 
     private static void create(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Upotreba: create <path>");
+            return;
+        }
+
         try {
+            RepositoryConfig config = configBuilder.build();
             publisher.create(input[1], config);
+            componentBuilder = null;
             System.out.println("Uspesno kreiran repozitorjum");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -123,44 +161,96 @@ public class Main {
     }
 
     private static void open(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Upotreba: open <path>");
+            return;
+        }
+
         try {
             publisher.open(input[1]);
+            componentBuilder = null;
             System.out.println("Uspesno otvoren repozitorijum");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private static void metadata(String[] input) {
-        ComponentId id;
-        List<Dependency> dependencies = new ArrayList<>();
-
-        id = new ComponentId(input[1], input[2], input[3]);
-
-        for (int i = 4; i < input.length; i++) {
-            String[] elem = input[i].split(":");
-            ComponentId dependencyId = new ComponentId(elem[0], elem[1], elem[2]);
-            Dependency dependency = new Dependency(dependencyId, elem[3], Boolean.parseBoolean(elem[4]));
-            dependencies.add(dependency);
+    private static void id(String[] input) {
+        if (input.length != 4) {
+            System.out.println("Upotreba: id <organization> <name> <version>");
+            return;
         }
 
         try {
-            component = new Component(id, dependencies);
+            ComponentBuilder builder = new ComponentBuilder();
+            builder.id(input[1], input[2], input[3]);
+
+            componentBuilder = builder;
+            System.out.println("Uspesno postavljen ID komponente");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Greska: " + e.getMessage());
+        }
+    }
+
+    private static void dependency(String[] input) {
+        if (input.length != 6) {
+            System.out.println("Upotreba: dependency <organization> <name> <version> <scope> <optional>");
+            return;
         }
 
-        System.out.println(component);
+        if (componentBuilder == null) {
+            System.out.println("Prvo definisite ID komponente");
+            return;
+        }
 
-        System.out.println("Uspesno napravljena komponenta");
+        try {
+            RepositoryConfig repoConfig = publisher.getConfig();
+
+            if (repoConfig == null) {
+                System.out.println("Prvo otvorite ili kreirajte repozitorijum");
+                return;
+            }
+
+            if (!repoConfig.scopes().containsKey(input[4]))
+                throw new IllegalArgumentException("Nepodrzan scope: " + input[4]);
+
+            if (!input[5].equalsIgnoreCase("true")
+                    && !input[5].equalsIgnoreCase("false"))
+                throw new IllegalArgumentException("Optional mora biti true ili false");
+
+            ComponentId id = new ComponentId(input[1], input[2], input[3]);
+
+            Dependency dependency = new Dependency(
+                    id,
+                    input[4],
+                    Boolean.parseBoolean(input[5])
+            );
+
+            componentBuilder.addDependency(dependency);
+
+            System.out.println("Uspesno dodata zavisnost: " + dependency);
+        } catch (Exception e) {
+            System.out.println("Greska: " + e.getMessage());
+        }
     }
 
     private static void publish(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Upotreba: publish <file>");
+            return;
+        }
+
+        if (componentBuilder == null) {
+            System.out.println("Prvo definisite ID komponente");
+            return;
+        }
+
         try {
-            publisher.publish(component, Path.of(input[1]));
+            publisher.publish(componentBuilder.build(), Path.of(input[1]));
+            componentBuilder = null;
             System.out.println("Uspesno objavljena komponenta");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Greska: " + e.getMessage());
         }
     }
 
@@ -195,33 +285,20 @@ public class Main {
         }
     }
 
-    private static void firstEntry() {
-        System.out.println("""
-                ================================================
-                      OBJAVLJIVANJE SOFTVERSKIH KOMPONENTI
-                ================================================
-                """);
-        help();
-    }
-
     private static void help() {
         System.out.println("""
                 Dostupne komande:
-                  config <extensions> --scopes <name:pulledAsTransitive>
+                  config extensions <extension1> <extension2> ...
+                  config scopes <scope1> <bool1> <scope2> <bool2> ...
+                  config clear
                   create <path>
                   open <path>
-                  metadata <organization> <name> <version> <dependencies: organization:name:version:scope:optional>
+                  id <organization> <name> <version>
+                  dependency <organization> <name> <version> <scope> <optional>
                   publish <file>
                   list [organization] [name] [version]
                   help
                   exit
-                
-                Postupak za koriscenje:
-                1. Kreirajte novi repozitorijum ili se povezite na postojeci,
-                    Ukoliko kreirate novi repozitorijum neophodno je prvo da definisete konfiguracioni fajl
-                2. Definiste metapodatke za komponentu (naziv organizacije, naziv projekta i verzija),
-                3. Objavite komponentu,
-                4. Ponovite postupak 2-3 ili zavrsite sa objavljivanjem.
                 """);
     }
 }
