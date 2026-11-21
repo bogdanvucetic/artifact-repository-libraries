@@ -12,21 +12,6 @@ import resolver.api.ResolveOptions;
 import java.nio.file.Path;
 import java.util.*;
 
-// todo: BITNO:
-//  - open za RAF server otvori repozitorijum koji ne postoji
-//  - kada je izuzetak samo crash-uje umesto da ga catch-uje
-//    - npr. da ne postoji fajl koji hocemo da pull-ujemo
-//  - download all from text file sto poziva resolveFromFile
-//
-// todo:
-//  - da proverava da li je otvoren fajl repozitorijum (da li ima config.json)
-//    i da li uspeva da ga parsira i sve sl. pre nego sto kaze uspesno
-//  - gdrive i rafov server nece imati podrsku za otvaranje repozitorijuma,
-//    tkd vrv. bi bilo najbolje nekako to da izmenim ovde tako da ne zove prvo
-//    open()
-//  - handling za komponente sa imenima koje imaju razmake
-//  - AKO IMAM VREMENA: da svaki lokalni/gdrive/raf repo ima svoje help klase
-//    ciji je zadatak da daju custom help i path za komande i sl.
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static DependencyResolver resolver;
