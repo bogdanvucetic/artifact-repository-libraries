@@ -12,3 +12,6 @@ include("impls:resolver-raf")
 
 include("apps:cli-publisher")
 include("apps:cli-resolver")
+
+include("resolver-drive")
+include("publisher-drive")
