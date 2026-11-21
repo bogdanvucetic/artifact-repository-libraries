@@ -8,5 +8,8 @@ import java.nio.file.Path;
 public interface DependencyResolver {
 
     ResolutionResult resolve(List<ComponentId> roots, ResolveOptions options);
+
     ResolutionResult resolveFromFile(Path componentsFile, ResolveOptions options);
+
+    void open(String location);
 }

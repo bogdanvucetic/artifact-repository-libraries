@@ -2,18 +2,19 @@ package cli.resolver;
 
 import dependency.resolver.DefaultDependencyResolver;
 import repository.common.ComponentId;
+import repository.common.StorageProvider;
 import resolver.api.ConflictStrategy;
 import resolver.api.DependencyResolver;
 import resolver.api.ResolveOptions;
-import resolver.api.ResolverProvider;
 
 import java.nio.file.Path;
 import java.util.*;
 
-// todo: BAGOVI:
+// todo: BITNO:
 //  - open za RAF server otvori repozitorijum koji ne postoji
 //  - kada je izuzetak samo crash-uje umesto da ga catch-uje
 //    - npr. da ne postoji fajl koji hocemo da pull-ujemo
+//  - download all from text file sto poziva resolveFromFile
 //
 // todo:
 //  - da proverava da li je otvoren fajl repozitorijum (da li ima config.json)
@@ -27,10 +28,10 @@ import java.util.*;
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static DependencyResolver resolver;
-    private static ResolverProvider provider;
+    private static StorageProvider provider;
 
     public static void main(String[] args) {
-        ServiceLoader<ResolverProvider> loader = ServiceLoader.load(ResolverProvider.class);
+        ServiceLoader<StorageProvider> loader = ServiceLoader.load(StorageProvider.class);
 
         provider = loader.stream()
                 .map(ServiceLoader.Provider::get)
@@ -38,6 +39,8 @@ public class Main {
                 .findFirst()
                 .orElseThrow(() ->
                         new IllegalArgumentException("Nepoznat tip repozitorijuma"));
+
+        System.out.println("Uspesno povezan na " + provider.name());
 
         menu();
     }
@@ -55,12 +58,16 @@ public class Main {
             String[] input = scanner.nextLine().trim().split(" ");
             String choice = input[0];
 
-            switch (choice) {
-                case "open" -> open(input);
-                case "download" -> download(input);
-                case "help" -> help();
-                case "exit" -> running = false;
-                default -> System.out.println("Nevalidna opcija");
+            try {
+                switch (choice) {
+                    case "open" -> open(input);
+                    case "download" -> download(input);
+                    case "help" -> help();
+                    case "exit" -> running = false;
+                    default -> System.out.println("Nevalidna opcija");
+                }
+            } catch (Exception e) {
+                System.out.println("Greska: " + e.getMessage());
             }
         }
 
@@ -69,8 +76,18 @@ public class Main {
     }
 
     private static void open(String[] input) {
-        resolver = new DefaultDependencyResolver(provider.open(input[1], null));
-        System.out.println("Uspesno otvoren folder na putanji " + input[1]);
+        if (input.length != 2) {
+            System.out.println("Upotreba: open <path>");
+            return;
+        }
+
+        DependencyResolver candidate =
+                new DefaultDependencyResolver(provider.create(Map.of()));
+
+        candidate.open(input[1]);
+        resolver = candidate;
+
+        System.out.println("Uspesno otvoren repozitorijum: " + input[1]);
     }
 
     private static void download(String[] input) {

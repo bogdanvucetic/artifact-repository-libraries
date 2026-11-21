@@ -2,13 +2,14 @@ package cli.publisher;
 
 import repository.common.*;
 import repository.publisher.Publisher;
-import repository.publisher.PublisherProvider;
 
 import java.nio.file.Path;
 import java.util.*;
 
 /*
 TODO:
+- pri metadata ili sl. komponenti da radi provere i da ne da dalje ako ima necega nepravilnog
+
  - da ne baci unsupported scope tek pri publish nego odmah pri dodavanju u cli
  - da se komponenta gradi kao component id <organization> <name> <version>,
    component add <organization> <name> <version> <scope> <optional>
@@ -36,16 +37,18 @@ public class Main {
     private static Component component;
 
     public static void main(String[] args) {
-        ServiceLoader<PublisherProvider> loader = ServiceLoader.load(PublisherProvider.class);
+        ServiceLoader<StorageProvider> loader = ServiceLoader.load(StorageProvider.class);
 
-        PublisherProvider provider = loader.stream()
+        StorageProvider provider = loader.stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(p -> p.name().equals(args[0]))
                 .findFirst()
                 .orElseThrow(() ->
                         new IllegalArgumentException("Nepoznat tip repozitorijuma"));
 
-        publisher = new Publisher(provider.newWriter(null));
+        publisher = new Publisher(provider.create(null));
+
+        System.out.println("Uspesno povezan na " + provider.name());
 
         menu();
     }
@@ -100,7 +103,12 @@ public class Main {
             i += 1;
         }
 
-        config = new RepositoryConfig(allowedExtensions, scopes);
+        try {
+            config = new RepositoryConfig(allowedExtensions, scopes);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
         System.out.println(config);
     }
 
@@ -109,7 +117,7 @@ public class Main {
             publisher.create(input[1], config);
             System.out.println("Uspesno kreiran repozitorjum");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -118,7 +126,7 @@ public class Main {
             publisher.open(input[1]);
             System.out.println("Uspesno otvoren repozitorijum");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -135,7 +143,12 @@ public class Main {
             dependencies.add(dependency);
         }
 
-        component = new Component(id, dependencies);
+        try {
+            component = new Component(id, dependencies);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
         System.out.println(component);
 
         System.out.println("Uspesno napravljena komponenta");
@@ -146,7 +159,7 @@ public class Main {
             publisher.publish(component, Path.of(input[1]));
             System.out.println("Uspesno objavljena komponenta");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

@@ -5,9 +5,9 @@ plugins {
 dependencies {
     implementation(project(":libs:component-publisher"))
 
-    runtimeOnly(project(":impls:publisher-local"))
-    runtimeOnly(project(":impls:publisher-raf"))
-    runtimeOnly(project(":impls:publisher-drive"))
+    runtimeOnly(project(":impls:local-storage"))
+    runtimeOnly(project(":impls:raf-storage"))
+    runtimeOnly(project(":impls:drive-storage"))
 }
 
 application {

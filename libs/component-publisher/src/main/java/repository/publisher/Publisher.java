@@ -30,11 +30,11 @@ public class Publisher {
     //  - create() bez konfig fajla overload?
     //  - da li ima još šta da se overload-uje?
 
-    private final RepositoryWriter storage;
+    private final Storage storage;
     private RepositoryConfig config;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public Publisher(RepositoryWriter storage) {
+    public Publisher(Storage storage) {
         this.storage = Objects.requireNonNull(storage, "Storage cannot be null");
     }
 
@@ -48,7 +48,7 @@ public class Publisher {
         String json = gson.toJson(config);
 
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
-            storage.writeNew(location + "/config.json", stream);
+            storage.writeNew("config.json", stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write repository configuration", e);
         }
@@ -59,6 +59,10 @@ public class Publisher {
     public void open(String location) {
         this.config = null;
         storage.openRepositoryAt(location);
+
+        if (!storage.exists(location + "/config.json"))
+            throw new RepositoryException("Folder nije repozitorijum: config.json ne postoji");
+
         loadConfig();
     }
 
@@ -109,7 +113,10 @@ public class Publisher {
     //  - da je neophodna makar jedna ekstenzija
     // mada ovo možda može i u RepositoryConfig konstruktor
     private void validateConfig(RepositoryConfig config) {
+        if (config == null)
+            throw new RepositoryException("Nevalidan config.json");
 
+        new RepositoryConfig(config.allowedExtensions(), config.scopes());
     }
 
     private void validatePublication(Component component, Path artifactPath) {

@@ -40,10 +40,10 @@ TODO: OBAVEZNO:
 //    i onda mozda kasnije moze overload?
 public class DefaultDependencyResolver implements DependencyResolver {
 
-    private final RepositoryReader reader;
+    private final Storage reader;
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public DefaultDependencyResolver(RepositoryReader reader) {
+    public DefaultDependencyResolver(Storage reader) {
         this.reader = reader;
     }
 
@@ -240,9 +240,10 @@ public class DefaultDependencyResolver implements DependencyResolver {
 
     private RepositoryConfig readConfig() {
         String path = RepositoryLayout.configFile();
-        if (!reader.exists(path)) {
+
+        if (!reader.exists(path))
             throw new RepositoryException("Repository config not found");
-        }
+
         return gson.fromJson(readText(path), RepositoryConfig.class);
     }
 
@@ -315,5 +316,16 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
 
         return resolve(roots, options);
+    }
+
+    public void open(String location) {
+        reader.openRepositoryAt(location);
+
+        RepositoryConfig config = readConfig();
+
+        if (config == null)
+            throw new RepositoryException("Nevalidan config.json");
+
+        new RepositoryConfig(config.allowedExtensions(), config.scopes());
     }
 }
