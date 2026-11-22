@@ -36,6 +36,18 @@ public class ComponentBuilder {
         return this;
     }
 
+    public ComponentBuilder removeDependency(String organization, String name, String version) {
+        return removeDependency(new ComponentId(organization, name, version));
+    }
+
+    public ComponentBuilder removeDependency(ComponentId id) {
+        Objects.requireNonNull(id, "ID cannot be null");
+
+        dependencies.removeIf(d -> d.id().equals(id));
+
+        return this;
+    }
+
     public ComponentBuilder addDependencies(Collection<Dependency> dependencies) {
         for (Dependency d : dependencies) {
             addDependency(d);

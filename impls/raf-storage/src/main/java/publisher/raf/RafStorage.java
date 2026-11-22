@@ -84,7 +84,7 @@ public class RafStorage implements Storage, AutoCloseable {
     }
 
     @Override
-    public void writeNew(String relativePath, InputStream content) {
+    public void createFile(String relativePath, InputStream content) {
         try (RemoteFile file = sftp.open(
                 resolve(relativePath),
                 EnumSet.of(OpenMode.WRITE, OpenMode.CREAT, OpenMode.EXCL)

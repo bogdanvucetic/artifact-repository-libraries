@@ -14,19 +14,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-/*
-TODO: OBAVEZNO:
- - reusability:
-   - da se tri identifikator projekta moze zadati preko tri stringa, kao
-     jedan string, jos nacina
- - repo search operacije:
-   - za organizaciju vraca sve njene projekte
-   - za org + projekat vraca sve verzije
-   - spisak zavisnosti neke komponente
- */
-
-// todo
-//  - create/open/publish -> createRepository(), openRepository(), publishToRepository()
 public class Publisher {
     private final Storage storage;
     private RepositoryConfig config;
@@ -36,7 +23,7 @@ public class Publisher {
         this.storage = Objects.requireNonNull(storage, "Storage cannot be null");
     }
 
-    public void create(String location, RepositoryConfig config) {
+    public void createRepository(String location, RepositoryConfig config) {
         Objects.requireNonNull(config, "Configuration cannot be null");
         validateConfig(config);
 
@@ -46,7 +33,7 @@ public class Publisher {
         String json = gson.toJson(config);
 
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
-            storage.writeNew("config.json", stream);
+            storage.createFile("config.json", stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write repository configuration", e);
         }
@@ -54,7 +41,7 @@ public class Publisher {
         this.config = config;
     }
 
-    public void open(String location) {
+    public void openRepository(String location) {
         this.config = null;
         storage.openRepositoryAt(location);
         loadConfig();
@@ -76,14 +63,14 @@ public class Publisher {
         storage.createDirectories(directory);
 
         try (InputStream stream = Files.newInputStream(artifactPath)) {
-            storage.writeNew(directory + "/" + artifactPath.getFileName().toString(), stream);
+            storage.createFile(directory + "/" + artifactPath.getFileName().toString(), stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write component", e);
         }
 
         String json = gson.toJson(component.dependencies());
         try (InputStream stream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
-            storage.writeNew(directory + "/dependencies.json", stream);
+            storage.createFile(directory + "/dependencies.json", stream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write dependencies.json", e);
         }

@@ -76,6 +76,7 @@ public class Main {
                 case "open" -> open(input);
                 case "id" -> id(input);
                 case "dependency" -> dependency(input);
+                case "dependency-remove" -> dependencyRemove(input);
                 case "publish" -> publish(input);
                 case "list" -> list(input);
                 case "help" -> help();
@@ -152,7 +153,7 @@ public class Main {
 
         try {
             RepositoryConfig config = configBuilder.build();
-            publisher.create(input[1], config);
+            publisher.createRepository(input[1], config);
             componentBuilder = null;
             System.out.println("Uspesno kreiran repozitorjum");
         } catch (Exception e) {
@@ -167,7 +168,7 @@ public class Main {
         }
 
         try {
-            publisher.open(input[1]);
+            publisher.openRepository(input[1]);
             componentBuilder = null;
             System.out.println("Uspesno otvoren repozitorijum");
         } catch (Exception e) {
@@ -234,6 +235,24 @@ public class Main {
         }
     }
 
+    public static void dependencyRemove(String[] input) {
+        if (input.length != 4) {
+            System.out.println("Upotreba: dependency-remove <organization> <name> <version>");
+            return;
+        }
+
+        if (componentBuilder == null) {
+            System.out.println("Ne pravite komponentu");
+            return;
+        }
+
+        try {
+            componentBuilder.removeDependency(input[1], input[2], input[3]);
+        } catch (Exception e) {
+            System.out.println("Greska: " + e.getMessage());
+        }
+    }
+
     private static void publish(String[] input) {
         if (input.length != 2) {
             System.out.println("Upotreba: publish <file>");
@@ -295,6 +314,7 @@ public class Main {
                   open <path>
                   id <organization> <name> <version>
                   dependency <organization> <name> <version> <scope> <optional>
+                  dependency-remove <organization> <name> <version>
                   publish <file>
                   list [organization] [name] [version]
                   help

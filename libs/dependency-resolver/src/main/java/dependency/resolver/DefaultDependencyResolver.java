@@ -18,26 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-/*
-TODO: OBAVEZNO:
- - koliko vidim ne povlaci sve zavisnosti kada:
-   - ja stavim includeOptionalRoots=true, ne povuce onaj koji je optional
- - reusability:
-   - da se zada organizacija/projekat iz kojeg se povlace sve komponente,
-   - da se tri identifikator projekta moze zadati preko tri stringa, kao
-     jedan string, jos nacina
- - repo search operacije:
-   - za organizaciju vraca sve njene projekte
-   - za org + projekat vraca sve verzije
-   - spisak zavisnosti neke komponente
- */
-
-// todo:
-//  - da li sam lepo razumeo da, ako npr. u repozitorijumu stoji da je neki scope
-//    optional, ali u komponenti stoji da ipak treba da se skine, da onda treba da
-//    ga skinemo, i da li se to ovde desava?
-//  - resolve da ne radi preko liste kompoennti nego samo komponentu po komponentu?
-//    i onda mozda kasnije moze overload?
 public class DefaultDependencyResolver implements DependencyResolver {
 
     private final Storage reader;

@@ -6,7 +6,6 @@ import repository.publisher.Publisher;
 import resolver.api.ConflictStrategy;
 import resolver.api.ResolutionResult;
 import resolver.api.ResolveOptions;
-import repository.publisher.drive.DriveStorageProvider;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +22,7 @@ public class DriveFullTest {
 
         Storage reader = new DriveStorageProvider().create(Map.of());
         Publisher publisher = new Publisher(reader);
-        publisher.create(REPO, new RepositoryConfig(Set.of("jar"), Map.of("compile", true, "test", false)));
+        publisher.createRepository(REPO, new RepositoryConfig(Set.of("jar"), Map.of("compile", true, "test", false)));
         System.out.println("Napravljen repozitorijum " + REPO);
 
         publish(publisher, artifacts, "rs.raf:x:1");

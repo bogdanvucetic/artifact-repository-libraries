@@ -62,7 +62,7 @@ public class DriveStorage implements Storage {
     }
 
     @Override
-    public void writeNew(String relativePath, InputStream content) {
+    public void createFile(String relativePath, InputStream content) {
         DrivePaths paths = paths();
 
         if (paths.findId(relativePath) != null) {

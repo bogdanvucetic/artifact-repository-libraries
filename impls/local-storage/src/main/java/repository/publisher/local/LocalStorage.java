@@ -59,7 +59,7 @@ public class LocalStorage implements Storage {
     }
 
     @Override
-    public void writeNew(String relativePath, InputStream content) {
+    public void createFile(String relativePath, InputStream content) {
         Path target = resolve(relativePath);
 
         // ne smemo da prepisemo postojeci fajl
